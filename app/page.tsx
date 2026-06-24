@@ -13,6 +13,19 @@ type Countdown = {
   seconds: number;
 };
 
+// ── Feiera platform integration metadata ──────────────────
+// Consumed by the Feiera event engine when this invite is
+// embedded as an event. All values are intentionally const
+// so they can be tree-shaken out of a static export.
+const EVENT_META = {
+  product: "Feiera",
+  parentBrand: "Neuverk",
+  eventSlug: "amal-athira",
+  eventType: "wedding",
+  eventTitle: "Amal & Athira",
+  publicUrl: "https://amal-athira.feiera.com",
+} as const;
+
 const SCHEDULE = [
   {
     time: "22 AUG · 3:00 PM",
@@ -202,6 +215,7 @@ export default function WeddingInvitation() {
                 setForm={setForm}
                 submitRsvp={submitRsvp}
               />
+              <FooterSection />
             </div>
           </motion.div>
         )}
@@ -722,12 +736,14 @@ function RsvpSection({
                 </button>
               </div>
 
-              <AnimatePresence>
-                {rsvpMode && (
+              <AnimatePresence mode="wait">
+                {rsvpMode === "yes" && (
                   <motion.form
+                    key="attending"
                     initial={{ opacity: 0, y: 16 }}
                     animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: 10 }}
+                    exit={{ opacity: 0, y: 8 }}
+                    transition={{ duration: 0.28 }}
                     onSubmit={submitRsvp}
                     className="mt-8 grid gap-3 text-left"
                   >
@@ -750,25 +766,13 @@ function RsvpSection({
                       value={form.phone}
                       onChange={(v) => setForm({ ...form, phone: v })}
                     />
-
-                    {rsvpMode === "yes" && (
-                      <RsvpInput
-                        type="number"
-                        min="1"
-                        placeholder="Number of guests"
-                        value={form.guests}
-                        onChange={(v) => setForm({ ...form, guests: v })}
-                      />
-                    )}
-
                     <textarea
                       rows={3}
                       placeholder="Your wishes / message"
                       value={form.message}
                       onChange={(e) => setForm({ ...form, message: e.target.value })}
-                      className="w-full resize-none border border-white/30 bg-white/10 px-5 py-4 font-body text-base italic text-[#fffaf0] outline-none placeholder:text-white/40"
+                      className="w-full resize-none border border-white/30 bg-white/10 px-5 py-4 font-body text-base italic text-[#fffaf0] outline-none placeholder:text-white/55"
                     />
-
                     <button
                       type="submit"
                       disabled={submitting}
@@ -777,6 +781,46 @@ function RsvpSection({
                       {submitting ? "Submitting..." : "Submit RSVP"}
                     </button>
                   </motion.form>
+                )}
+
+                {rsvpMode === "no" && (
+                  <motion.div
+                    key="not-attending"
+                    initial={{ opacity: 0, y: 16 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 8 }}
+                    transition={{ duration: 0.28 }}
+                    className="mt-8"
+                  >
+                    <div className="mb-6 text-center">
+                      <p className="font-display text-2xl text-[#fffaf0]">We&apos;ll miss you 🤍</p>
+                      <p className="mt-2 font-body text-base italic text-white/70">
+                        Send your wishes to Amal &amp; Athira
+                      </p>
+                    </div>
+                    <form onSubmit={submitRsvp} className="grid gap-3 text-left">
+                      <RsvpInput
+                        required
+                        placeholder="Your name"
+                        value={form.name}
+                        onChange={(v) => setForm({ ...form, name: v })}
+                      />
+                      <textarea
+                        rows={4}
+                        placeholder="Your wishes / message"
+                        value={form.message}
+                        onChange={(e) => setForm({ ...form, message: e.target.value })}
+                        className="w-full resize-none border border-white/30 bg-white/10 px-5 py-4 font-body text-base italic text-[#fffaf0] outline-none placeholder:text-white/55"
+                      />
+                      <button
+                        type="submit"
+                        disabled={submitting}
+                        className="mt-1 w-full bg-[#fffaf0] px-8 py-4 font-caption text-[10px] font-semibold uppercase tracking-[0.22em] text-[#4d6135] disabled:opacity-60"
+                      >
+                        {submitting ? "Sending..." : "Send Wishes"}
+                      </button>
+                    </form>
+                  </motion.div>
                 )}
               </AnimatePresence>
             </>
@@ -792,6 +836,30 @@ function RsvpSection({
         </div>
       </div>
     </section>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════
+   FEIERA FOOTER
+═══════════════════════════════════════════════════════════ */
+
+function FooterSection() {
+  return (
+    <footer className="border-t border-white/15 px-6 pb-12 pt-10 text-center">
+      <div className="mx-auto max-w-xs">
+        <p className="font-display text-sm italic text-white/52">
+          An invitation experience by{" "}
+          <span className="not-italic tracking-[0.06em]">{EVENT_META.product}</span>
+        </p>
+        <p className="mt-2 font-caption text-[8px] uppercase tracking-[0.3em] text-white/36">
+          Part of the {EVENT_META.parentBrand} family
+        </p>
+        <div className="mx-auto my-4 h-px w-8 bg-white/18" />
+        <p className="font-caption text-[7.5px] uppercase tracking-[0.2em] text-white/28">
+          &copy; 2026 {EVENT_META.parentBrand}. All rights reserved.
+        </p>
+      </div>
+    </footer>
   );
 }
 
@@ -818,7 +886,7 @@ function RsvpInput({
       placeholder={placeholder}
       value={value}
       onChange={(e) => onChange(e.target.value)}
-      className="w-full border border-white/30 bg-white/10 px-5 py-4 font-body text-base italic text-[#fffaf0] outline-none placeholder:text-white/40"
+      className="w-full border border-white/30 bg-white/10 px-5 py-4 font-body text-base italic text-[#fffaf0] outline-none placeholder:text-white/55"
     />
   );
 }
