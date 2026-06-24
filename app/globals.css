@@ -1,26 +1,157 @@
+/* ════════════════════════════════════════════
+   GLOBALS — Wedding Invitation
+   Kerala luxury digital invitation
+════════════════════════════════════════════ */
+
+@import url('https://fonts.googleapis.com/css2?family=Allura&family=Great+Vibes&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=EB+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap');
+
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* ── Font smoothing & rendering ── */
+* {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+html {
+  scroll-behavior: smooth;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+/* ── Custom scrollbar — thin, olive ── */
+::-webkit-scrollbar {
+  width: 4px;
+}
+::-webkit-scrollbar-track {
+  background: #f6f1e7;
+}
+::-webkit-scrollbar-thumb {
+  background: #8a9b61;
+  border-radius: 2px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #5f773d;
+}
+
+/* ── Paper textures ── */
+
+/* Cream/ivory handmade paper */
+.paper-cream {
+  background-color: #fbfaf4;
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='400' height='400' filter='url(%23noise)' opacity='0.035'/%3E%3C/svg%3E"),
+    repeating-linear-gradient(
+      0deg,
+      transparent 0px,
+      transparent 2px,
+      rgba(160, 140, 100, 0.018) 2px,
+      rgba(160, 140, 100, 0.018) 3px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent 0px,
+      transparent 4px,
+      rgba(140, 120, 80, 0.012) 4px,
+      rgba(140, 120, 80, 0.012) 5px
+    ),
+    radial-gradient(ellipse 80% 60% at 15% 15%, rgba(200, 175, 110, 0.14) 0%, transparent 55%),
+    radial-gradient(ellipse 60% 50% at 85% 85%, rgba(160, 130, 70, 0.10) 0%, transparent 50%);
+}
+
+/* Green handmade paper */
+.paper-green {
+  background-color: #748354;
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='400' height='400' filter='url(%23noise)' opacity='0.06'/%3E%3C/svg%3E"),
+    repeating-linear-gradient(
+      0deg,
+      transparent 0px,
+      transparent 3px,
+      rgba(255, 255, 255, 0.025) 3px,
+      rgba(255, 255, 255, 0.025) 4px
+    ),
+    repeating-linear-gradient(
+      85deg,
+      transparent 0px,
+      transparent 6px,
+      rgba(255, 255, 255, 0.015) 6px,
+      rgba(255, 255, 255, 0.015) 7px
+    ),
+    radial-gradient(ellipse 70% 50% at 20% 20%, rgba(180, 200, 140, 0.18) 0%, transparent 55%),
+    radial-gradient(ellipse 60% 60% at 80% 80%, rgba(60, 90, 30, 0.25) 0%, transparent 50%);
+}
+
+/* ── Typography system ── */
+.font-display {
+  font-family: 'Cormorant Garamond', 'EB Garamond', Georgia, serif;
+}
+
+.font-body {
+  font-family: 'EB Garamond', Georgia, serif;
+}
+
+.font-caption {
+  font-family: 'Jost', sans-serif;
+}
+
+.font-script {
+  font-family: 'Allura', 'Great Vibes', cursive;
+}
+
+/* ── Invitation text sizes ── */
+.text-invite-xl {
+  font-size: clamp(2.2rem, 6.5vw, 4rem);
+  letter-spacing: 0.22em;
+  line-height: 1.1;
+}
+.text-invite-lg {
+  font-size: clamp(1.6rem, 4.5vw, 2.8rem);
+  letter-spacing: 0.18em;
+  line-height: 1.15;
+}
+.text-invite-md {
+  font-size: clamp(1rem, 2.5vw, 1.35rem);
+  letter-spacing: 0.06em;
+  line-height: 1.7;
+}
+
+/* ── Ornamental divider ── */
+.divider-olive {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  justify-content: center;
+}
+.divider-olive::before,
+.divider-olive::after {
+  content: '';
+  flex: 0 0 48px;
+  height: 1px;
+  background: rgba(111, 132, 63, 0.35);
+}
+
+/* ── Reduced motion ── */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
   }
 }
-
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  margin: 0;
+  background: #fbfaf4;
+}
+
+input,
+textarea,
+button {
+  border-radius: 0;
+}
+body {
+  margin: 0;
+  background: #fbfaf4;
+}
+
+img {
+  user-select: none;
 }
