@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { CheckCircle2 } from "lucide-react";
 
@@ -38,6 +38,17 @@ const SCHEDULE = [
 
 export default function WeddingInvitation() {
   const [opened, setOpened] = useState(false);
+  const [opening, setOpening] = useState(false);
+  const [showPreparing, setShowPreparing] = useState(false);
+  const preparingTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  function handleOpen() {
+    if (opening || opened) return;
+    setOpening(true);
+    setOpened(true);
+    // Safety net: show "Preparing…" only if animation takes > 1s (e.g. slow devices)
+    preparingTimerRef.current = setTimeout(() => setShowPreparing(true), 1000);
+  }
 
   const [countdown, setCountdown] = useState<Countdown>({
     days: 0,
@@ -132,7 +143,7 @@ export default function WeddingInvitation() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.5 }}
-            onClick={() => setOpened(false)}
+            onClick={() => { setOpened(false); setOpening(false); setShowPreparing(false); }}
             className="fixed left-5 top-5 z-50 font-caption text-[8px] uppercase tracking-[0.35em] text-white/45 transition-colors duration-200 hover:text-white/80"
           >
             ← back to card
@@ -140,19 +151,44 @@ export default function WeddingInvitation() {
         )}
       </AnimatePresence>
 
-      <AnimatePresence mode="wait">
+      {/* Fallback overlay — only shows on very slow devices if animation > 1s */}
+      <AnimatePresence>
+        {showPreparing && (
+          <motion.div
+            key="preparing"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            className="pointer-events-none fixed inset-0 z-40 flex items-center justify-center"
+          >
+            <p className="font-caption text-[10px] uppercase tracking-[0.36em] text-[#6f843f]">
+              Preparing your invitation…
+            </p>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* mode="popLayout" lets exit + entry run in parallel (exit element leaves layout instantly) */}
+      <AnimatePresence mode="popLayout">
         {!opened ? (
           <OpeningInvite
             key="opening"
             countdown={countdown}
-            onOpen={() => setOpened(true)}
+            onOpen={handleOpen}
+            opening={opening}
           />
         ) : (
           <motion.div
             key="content"
-            initial={{ opacity: 0, y: 60 }}
+            initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1.3, ease: "easeOut" }}
+            transition={{ duration: 0.7, ease: "easeOut" }}
+            onAnimationComplete={() => {
+              // Content is fully visible — dismiss the fallback overlay
+              if (preparingTimerRef.current) clearTimeout(preparingTimerRef.current);
+              setShowPreparing(false);
+            }}
           >
             <div className="paper-green relative z-10 min-h-screen text-[#fffaf0]">
               <GreenInvitation />
@@ -181,15 +217,17 @@ export default function WeddingInvitation() {
 function OpeningInvite({
   countdown,
   onOpen,
+  opening,
 }: {
   countdown: Countdown;
   onOpen: () => void;
+  opening: boolean;
 }) {
   return (
     <motion.section
       className="paper-cream relative flex h-screen items-center overflow-hidden"
-      exit={{ opacity: 0, scale: 1.15, filter: "blur(8px)" }}
-      transition={{ duration: 1.2, ease: "easeInOut" }}
+      exit={{ opacity: 0, scale: 1.06, filter: "blur(4px)" }}
+      transition={{ duration: 0.3, ease: "easeIn" }}
     >
       {/* Deep parchment vignette */}
       <div className="pointer-events-none absolute inset-0 shadow-[inset_0_0_200px_rgba(100,80,40,0.2)]" />
@@ -273,16 +311,25 @@ function OpeningInvite({
           <div className="mt-5 flex flex-col items-center gap-2.5 lg:items-start">
             <motion.button
               onClick={onOpen}
-              whileHover={{ scale: 1.02, backgroundColor: "#3d4f28" }}
-              whileTap={{ scale: 0.97 }}
+              disabled={opening}
+              whileHover={opening ? {} : { scale: 1.02, backgroundColor: "#3d4f28" }}
+              whileTap={opening ? {} : { scale: 0.97 }}
               transition={{ duration: 0.18 }}
-              className="bg-[#4d6135] px-10 py-3.5 font-caption text-[9px] uppercase tracking-[0.36em] text-[#f8f5ec] shadow-[0_4px_20px_rgba(77,97,53,0.25)]"
+              className="relative bg-[#4d6135] px-10 py-3.5 font-caption text-[9px] uppercase tracking-[0.36em] text-[#f8f5ec] shadow-[0_4px_20px_rgba(77,97,53,0.25)] disabled:cursor-default disabled:opacity-80"
             >
-              Open Invitation
+              {opening ? (
+                <span className="flex items-center gap-2.5">
+                  <span className="inline-block h-2 w-2 animate-pulse rounded-full bg-[#f8f5ec]/70" />
+                  Opening…
+                </span>
+              ) : (
+                "Open Invitation"
+              )}
             </motion.button>
             <button
               onClick={onOpen}
-              className="font-caption text-[8px] uppercase tracking-[0.28em] text-[#6f843f]/50 transition-colors hover:text-[#6f843f]/80"
+              disabled={opening}
+              className="font-caption text-[8px] uppercase tracking-[0.28em] text-[#6f843f]/50 transition-colors hover:text-[#6f843f]/80 disabled:pointer-events-none"
             >
               view details →
             </button>
@@ -291,7 +338,7 @@ function OpeningInvite({
 
         {/* RIGHT — invitation preview card */}
         <div className="flex justify-center lg:justify-end">
-          <InvitationCard onOpen={onOpen} />
+          <InvitationCard onOpen={onOpen} opening={opening} />
         </div>
       </div>
     </motion.section>
@@ -299,14 +346,14 @@ function OpeningInvite({
 }
 
 /* Floating invitation card — tap to open */
-function InvitationCard({ onOpen }: { onOpen: () => void }) {
+function InvitationCard({ onOpen, opening }: { onOpen: () => void; opening: boolean }) {
   return (
     /* Entry animation + hover tilt */
     <motion.div
       initial={{ opacity: 0, y: 40, rotate: -3 }}
       animate={{ opacity: 1, y: 0, rotate: 0 }}
       transition={{ duration: 1.1, ease: "easeOut" }}
-      whileHover={{ rotate: 1.5 }}
+      whileHover={opening ? {} : { rotate: 1.5 }}
       className="relative"
     >
       {/* Back envelope layer — peeking behind the card */}
@@ -315,11 +362,12 @@ function InvitationCard({ onOpen }: { onOpen: () => void }) {
       {/* Floating button */}
       <motion.button
         onClick={onOpen}
-        animate={{ y: [0, -8, 0] }}
+        disabled={opening}
+        animate={opening ? {} : { y: [0, -8, 0] }}
         transition={{ repeat: Infinity, duration: 5.5, ease: "easeInOut" }}
-        whileTap={{ scale: 0.97 }}
+        whileTap={opening ? {} : { scale: 0.97 }}
         aria-label="Tap to open invitation"
-        className="relative w-[min(90vw,420px)] cursor-pointer rounded-[1.5rem] border border-[#b59b5b]/45 bg-[#fffdf6]/90 px-8 py-10 text-center shadow-2xl outline-none lg:px-10 lg:py-12"
+        className="relative w-[min(90vw,420px)] cursor-pointer rounded-[1.5rem] border border-[#b59b5b]/45 bg-[#fffdf6]/90 px-8 py-10 text-center shadow-2xl outline-none disabled:cursor-default lg:px-10 lg:py-12"
       >
         {/* Thin inner border */}
         <div className="pointer-events-none absolute inset-[6px] rounded-[1rem] border border-[#b59b5b]/16" />
@@ -381,7 +429,7 @@ function InvitationCard({ onOpen }: { onOpen: () => void }) {
           </p>
 
           <p className="mt-5 font-display text-[10px] italic text-[#b59b5b]/60">
-            tap to open ↓
+            {opening ? "opening…" : "tap to open ↓"}
           </p>
         </motion.div>
       </motion.button>

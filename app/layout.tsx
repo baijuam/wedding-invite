@@ -38,6 +38,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        {/* Speed up Google Fonts connection */}
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        {/* Preload the temple watermark so it's ready before the invite opens */}
+        <link rel="preload" as="image" href="/temple.png" />
+      </head>
       <body>{children}</body>
     </html>
   );
