@@ -157,7 +157,7 @@ export default function WeddingInvitation() {
             exit={{ opacity: 0 }}
             transition={{ duration: 0.5 }}
             onClick={() => { setOpened(false); setOpening(false); setShowPreparing(false); }}
-            className="fixed left-5 top-5 z-50 font-caption text-[8px] uppercase tracking-[0.35em] text-white/45 transition-colors duration-200 hover:text-white/80"
+            className="fixed left-4 top-4 z-50 font-caption text-[9px] uppercase tracking-[0.35em] text-white/45 transition-colors duration-200 hover:text-white/80"
           >
             ← back to card
           </motion.button>
@@ -239,7 +239,7 @@ function OpeningInvite({
 }) {
   return (
     <motion.section
-      className="paper-cream relative flex h-screen items-center overflow-hidden"
+      className="paper-cream relative flex min-h-svh items-center overflow-x-hidden lg:h-screen lg:overflow-hidden"
       exit={{ opacity: 0, scale: 1.06, filter: "blur(4px)" }}
       transition={{ duration: 0.3, ease: "easeIn" }}
     >
@@ -252,7 +252,7 @@ function OpeningInvite({
           src="/temple.png"
           alt=""
           aria-hidden="true"
-          className="h-[68%] w-auto object-contain mix-blend-multiply"
+          className="h-[52%] w-auto object-contain mix-blend-multiply sm:h-[68%]"
           style={{ opacity: 0.04 }}
         />
       </div>
@@ -267,7 +267,7 @@ function OpeningInvite({
       </div>
 
       {/* ── Main layout: left text | right card ── */}
-      <div className="relative z-10 mx-auto grid w-full max-w-[1200px] grid-cols-1 items-center gap-8 px-6 py-6 lg:grid-cols-[1.1fr_0.9fr] lg:gap-12 lg:px-12 lg:py-0">
+      <div className="relative z-10 mx-auto grid w-full max-w-[1200px] grid-cols-1 items-center gap-6 px-4 py-8 sm:px-6 lg:grid-cols-[1.1fr_0.9fr] lg:gap-12 lg:px-12 lg:py-0">
 
         {/* LEFT — invitation hero text */}
         <div className="flex flex-col items-center text-center lg:items-start lg:text-left">
@@ -283,9 +283,9 @@ function OpeningInvite({
 
           {/* Headline */}
           <div className="font-display leading-[1.1] text-[#4d6135]">
-            <p className="text-[clamp(2.4rem,5.2vw,4.2rem)]">Two hearts.</p>
-            <p className="text-[clamp(2.4rem,5.2vw,4.2rem)]">One promise.</p>
-            <p className="text-[clamp(2.4rem,5.2vw,4.2rem)] italic text-[#6f843f]">
+            <p className="text-[clamp(1.9rem,5.2vw,4.2rem)]">Two hearts.</p>
+            <p className="text-[clamp(1.9rem,5.2vw,4.2rem)]">One promise.</p>
+            <p className="text-[clamp(1.9rem,5.2vw,4.2rem)] italic text-[#6f843f]">
               A lifetime together.
             </p>
           </div>
@@ -314,7 +314,7 @@ function OpeningInvite({
           </p>
 
           {/* Countdown */}
-          <div className="mt-4 grid w-[16rem] grid-cols-4 gap-1.5">
+          <div className="mt-4 grid w-full max-w-60 grid-cols-4 gap-1.5">
             <CountdownBox value={countdown.days} label="Days" />
             <CountdownBox value={countdown.hours} label="Hrs" />
             <CountdownBox value={countdown.minutes} label="Min" />
@@ -371,7 +371,7 @@ function InvitationCard({ onOpen, opening }: { onOpen: () => void; opening: bool
       className="relative"
     >
       {/* Back envelope layer — peeking behind the card */}
-      <div className="pointer-events-none absolute inset-0 translate-x-4 translate-y-3 rotate-[5deg] rounded-[1.5rem] border border-[#8a9b61]/20 bg-[#dfe7d2]/60" />
+      <div className="pointer-events-none absolute inset-0 translate-x-4 translate-y-3 rotate-[5deg] rounded-3xl border border-[#8a9b61]/20 bg-[#dfe7d2]/60" />
 
       {/* Floating button */}
       <motion.button
@@ -381,13 +381,13 @@ function InvitationCard({ onOpen, opening }: { onOpen: () => void; opening: bool
         transition={{ repeat: Infinity, duration: 5.5, ease: "easeInOut" }}
         whileTap={opening ? {} : { scale: 0.97 }}
         aria-label="Tap to open invitation"
-        className="relative w-[min(90vw,420px)] cursor-pointer rounded-[1.5rem] border border-[#b59b5b]/45 bg-[#fffdf6]/90 px-8 py-10 text-center shadow-2xl outline-none disabled:cursor-default lg:px-10 lg:py-12"
+        className="relative w-[min(86vw,360px)] cursor-pointer rounded-3xl border border-[#b59b5b]/45 bg-[#fffdf6]/90 px-5 py-6 text-center shadow-2xl outline-none disabled:cursor-default sm:w-[min(88vw,420px)] sm:px-8 sm:py-10 lg:px-10 lg:py-12"
       >
         {/* Thin inner border */}
-        <div className="pointer-events-none absolute inset-[6px] rounded-[1rem] border border-[#b59b5b]/16" />
+        <div className="pointer-events-none absolute inset-1.5 rounded-2xl border border-[#b59b5b]/16" />
 
         {/* Temple watermark inside card */}
-        <div className="pointer-events-none absolute inset-0 flex items-end justify-center overflow-hidden rounded-[1.5rem]">
+        <div className="pointer-events-none absolute inset-0 flex items-end justify-center overflow-hidden rounded-3xl">
           <img
             src="/temple.png"
             alt=""
@@ -400,9 +400,9 @@ function InvitationCard({ onOpen, opening }: { onOpen: () => void; opening: bool
         {/* Content — lifts on hover */}
         <motion.div className="relative z-10" whileHover={{ y: -4 }} transition={{ duration: 0.25 }}>
           {/* Script names */}
-          <p className="font-script text-[4rem] leading-none text-[#4d6135]">Amal</p>
-          <p className="my-2 font-display text-[1.2rem] italic text-[#b59b5b]">&amp;</p>
-          <p className="font-script text-[4rem] leading-none text-[#4d6135]">Athira</p>
+          <p className="font-script text-[clamp(2.25rem,12vw,3.5rem)] leading-none text-[#4d6135]">Amal</p>
+          <p className="my-2 font-display text-[clamp(1rem,3vw,1.2rem)] italic text-[#b59b5b]">&amp;</p>
+          <p className="font-script text-[clamp(2.25rem,12vw,3.5rem)] leading-none text-[#4d6135]">Athira</p>
 
           {/* Gold rule */}
           <div className="mx-auto mt-4 mb-4 flex items-center justify-center gap-2">
@@ -581,13 +581,13 @@ function GreenInvitation() {
           of the marriage of their beloved son
         </p>
 
-        <h1 className="mt-12 font-display text-[clamp(2.5rem,7vw,5rem)] uppercase leading-none tracking-[0.25em] text-[#fffaf0]">
+        <h1 className="mt-12 font-display text-[clamp(1.6rem,7vw,5rem)] uppercase leading-none tracking-[0.08em] sm:tracking-[0.25em] text-[#fffaf0]">
           AMAL BAIJU
         </h1>
 
         <p className="my-6 font-display text-3xl italic text-white/80 md:text-4xl">and</p>
 
-        <h2 className="font-display text-[clamp(2.3rem,7vw,5rem)] uppercase leading-none tracking-[0.22em] text-[#fffaf0]">
+        <h2 className="font-display text-[clamp(1.5rem,6.8vw,5rem)] uppercase leading-none tracking-[0.06em] sm:tracking-[0.22em] text-[#fffaf0]">
           ATHIRA SUSEELAN
         </h2>
 

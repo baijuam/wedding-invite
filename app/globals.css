@@ -137,9 +137,15 @@ html {
     transition-duration: 0.01ms !important;
   }
 }
+html {
+  overflow-x: hidden;
+}
+
 body {
   margin: 0;
   background: #fbfaf4;
+  overflow-x: hidden;
+  min-height: 100svh;
 }
 
 input,
@@ -147,11 +153,6 @@ textarea,
 button {
   border-radius: 0;
 }
-body {
-  margin: 0;
-  background: #fbfaf4;
-}
-
 img {
   user-select: none;
 }
