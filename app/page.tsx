@@ -73,6 +73,7 @@ export default function WeddingInvitation() {
   const [rsvpMode, setRsvpMode] = useState<RsvpMode>(null);
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [rsvpDuplicate, setRsvpDuplicate] = useState(false);
 
   const [form, setForm] = useState({
     name: "",
@@ -114,6 +115,19 @@ export default function WeddingInvitation() {
       return;
     }
 
+    // Client-side validation
+    if (rsvpMode === "yes") {
+      if (!form.name.trim() || !form.email.trim()) {
+        alert("Please enter your name and email address.");
+        return;
+      }
+    } else {
+      if (!form.name.trim() || !form.email.trim() || !form.message.trim()) {
+        alert("Please enter your name, email address, and wishes message.");
+        return;
+      }
+    }
+
     setSubmitting(true);
 
     try {
@@ -130,15 +144,30 @@ export default function WeddingInvitation() {
         }),
       });
 
-      const data = await res.json();
-
-      if (data.success) {
-        setSubmitted(true);
-      } else {
-        alert("Something went wrong. Please try again.");
+      let data: { success?: boolean; duplicate?: boolean; error?: string };
+      try {
+        data = await res.json();
+      } catch {
+        data = { success: false, error: "Server returned an invalid response." };
       }
+      console.log("RSVP response:", data);
+
+      if (data.success && data.duplicate) {
+        setRsvpDuplicate(true);
+        setSubmitted(true);
+        return;
+      }
+
+      if (!res.ok || !data.success) {
+        console.error("RSVP failed:", data);
+        alert(data.error || "Something went wrong. Please try again.");
+        return;
+      }
+
+      setRsvpDuplicate(false);
+      setSubmitted(true);
     } catch (error) {
-      console.error(error);
+      console.error("RSVP error:", error);
       alert("Something went wrong. Please try again.");
     } finally {
       setSubmitting(false);
@@ -211,6 +240,7 @@ export default function WeddingInvitation() {
                 setRsvpMode={setRsvpMode}
                 submitted={submitted}
                 submitting={submitting}
+                rsvpDuplicate={rsvpDuplicate}
                 form={form}
                 setForm={setForm}
                 submitRsvp={submitRsvp}
@@ -672,6 +702,7 @@ function RsvpSection({
   setRsvpMode,
   submitted,
   submitting,
+  rsvpDuplicate,
   form,
   setForm,
   submitRsvp,
@@ -680,6 +711,7 @@ function RsvpSection({
   setRsvpMode: (mode: RsvpMode) => void;
   submitted: boolean;
   submitting: boolean;
+  rsvpDuplicate: boolean;
   form: {
     name: string;
     guests: string;
@@ -805,6 +837,13 @@ function RsvpSection({
                         value={form.name}
                         onChange={(v) => setForm({ ...form, name: v })}
                       />
+                      <RsvpInput
+                        required
+                        type="email"
+                        placeholder="Your email address"
+                        value={form.email}
+                        onChange={(v) => setForm({ ...form, email: v })}
+                      />
                       <textarea
                         rows={4}
                         placeholder="Your wishes / message"
@@ -829,7 +868,9 @@ function RsvpSection({
               <CheckCircle2 className="mx-auto text-[#fffaf0]" size={44} />
               <h3 className="mt-5 font-display text-3xl text-[#fffaf0]">Thank you.</h3>
               <p className="mt-2 font-body text-base italic text-white/75">
-                Your response has been received.
+                {rsvpDuplicate
+                  ? "This email address has already been used. Your RSVP or wishes have already been delivered successfully."
+                  : "Your response has been received."}
               </p>
             </div>
           )}
